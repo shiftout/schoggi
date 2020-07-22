@@ -1,0 +1,73 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Schoggi</h1>
+    <p>Chocolate bars and drops.</p>
+</div>
+
+<div class="card bg-dark text-white">
+    <div class="card-header">Upload something?</div>
+    <div class="card-body">
+        <p>Supported extensions: <code>.txt</code>, <code>.log</code>, <code>.zip</code>.</p>
+        <form enctype="multipart/form-data" method="post">
+            <dl>
+                <dd>
+                    <input asp-for="FileUpload.FormFile" type="file" />
+                    <span asp-validation-for="FileUpload.FormFile"></span>
+                </dd>
+            </dl>
+            <input asp-page-handler="Upload" class="btn btn-sm btn-primary" type="submit" value="Upload" />
+        </form>
+    </div>
+    <div class="card-footer">@Model.Result</div>
+</div>
+
+<br/>
+
+<h3>Chocolate bars</h3>
+
+@if (Model.PhysicalFiles == null || Model.PhysicalFiles.Count() == 0)
+{
+    <p>
+        No files are available. Why not trying uploading one?
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th class="text-center">
+                    Size (bytes)
+                </th>
+                <th class="text-center">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var file in Model.PhysicalFiles.Where(f => f.IsDirectory == false))
+            {
+                <tr>
+                    <td>
+                        <pre>@file.Name</pre>
+                    </td>
+                    <td class="text-center">
+                        <pre>@file.Length.ToString("N0")</pre>
+                    </td>
+                    <td class="text-center">
+                        <a asp-page-handler="DownloadPhysical" asp-route-fileName="@file.Name" class="btn btn-sm btn-outline-secondary">Download</a>
+                        <a asp-page="./DeletePhysical" asp-route-fileName="@file.Name" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
